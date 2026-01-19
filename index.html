@@ -1,153 +1,669 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Print Ticket</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Receipt - Print View</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Reset and Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            padding: 40px;
-            background: #f0f2f5;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
         }
-        .ticket {
+        
+        /* Ticket Container */
+        .ticket-container {
+            width: 100%;
+            max-width: 900px;
             background: white;
-            padding: 40px;
-            max-width: 600px;
-            margin: 0 auto;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
         }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            border-bottom: 3px solid #3498db;
-            padding-bottom: 15px;
-        }
-        .ticket-id {
-            background: #2c3e50;
+        
+        /* Header */
+        .ticket-header {
+            background: linear-gradient(90deg, #2c3e50 0%, #4a6572 100%);
             color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 24px;
-            margin: 20px 0;
-            border-radius: 5px;
-            font-family: monospace;
+            padding: 40px 50px;
+            position: relative;
+            overflow: hidden;
         }
-        .info {
-            margin: 15px 0;
-            padding: 10px;
+        
+        .ticket-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.1;
+        }
+        
+        .company-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .company-logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #3498db;
+        }
+        
+        .company-details {
+            text-align: right;
+        }
+        
+        .company-name {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        
+        .company-tagline {
+            font-size: 14px;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+        
+        .ticket-title {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .ticket-title h1 {
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .ticket-title p {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        /* Ticket ID Badge */
+        .ticket-id-badge {
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 25px 40px;
+            margin: 30px 50px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ticket-id-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #f1c40f, #f39c12);
+        }
+        
+        .ticket-id-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .ticket-id-value {
+            font-size: 42px;
+            font-weight: 800;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
+        
+        /* Ticket Details */
+        .ticket-body {
+            padding: 40px 50px;
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .detail-card {
             background: #f8f9fa;
-            border-radius: 5px;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 5px solid #3498db;
+            transition: transform 0.3s ease;
         }
-        .print-btn {
-            background: #27ae60;
-            color: white;
-            padding: 12px 25px;
+        
+        .detail-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #7f8c8d;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .detail-value {
+            font-size: 20px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        /* Footer */
+        .ticket-footer {
+            background: #f8f9fa;
+            padding: 30px 50px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .footer-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .print-info {
+            color: #6c757d;
+        }
+        
+        .print-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .print-info i {
+            color: #3498db;
+            margin-right: 8px;
+        }
+        
+        .security-note {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #ffc107;
+            font-size: 14px;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+            padding: 30px;
+            border-top: 1px solid #eee;
+        }
+        
+        .btn {
+            padding: 16px 35px;
             border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            border-radius: 10px;
             font-size: 16px;
-            margin: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            letter-spacing: 1px;
         }
-        .close-btn {
-            background: #e74c3c;
+        
+        .btn-print {
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
             color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin: 10px;
+            box-shadow: 0 5px 20px rgba(39, 174, 96, 0.3);
         }
+        
+        .btn-print:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
+        }
+        
+        .btn-close {
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+            color: white;
+            box-shadow: 0 5px 20px rgba(231, 76, 60, 0.3);
+        }
+        
+        .btn-close:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+        }
+        
+        .btn-download {
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            color: white;
+            box-shadow: 0 5px 20px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+        }
+        
+        /* Print Styles */
         @media print {
-            body { padding: 0; background: white; }
-            .ticket { box-shadow: none; }
-            .no-print { display: none; }
+            body {
+                background: white !important;
+                padding: 0 !important;
+            }
+            
+            .ticket-container {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                max-width: 100% !important;
+            }
+            
+            .action-buttons,
+            .btn {
+                display: none !important;
+            }
+            
+            .ticket-header {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .ticket-id-badge {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .ticket-header,
+            .ticket-body {
+                padding: 30px;
+            }
+            
+            .ticket-id-badge {
+                margin: 20px;
+                padding: 20px;
+            }
+            
+            .ticket-id-value {
+                font-size: 32px;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-grid {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+        
+        /* Watermark */
+        .watermark {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            opacity: 0.05;
+            font-size: 120px;
+            font-weight: 900;
+            color: #2c3e50;
+            z-index: 0;
+            pointer-events: none;
+            user-select: none;
+        }
+        
+        /* QR Code Placeholder */
+        .qr-placeholder {
+            width: 120px;
+            height: 120px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 12px;
+            text-align: center;
+            margin: 0 auto;
         }
     </style>
 </head>
 <body>
-    <div class="ticket">
-        <h1>🎫 TICKET RECEIPT</h1>
+    <div class="ticket-container">
+        <!-- Watermark -->
+        <div class="watermark">RECEIPT</div>
         
-        <div class="ticket-id" id="ticketNumber">
-            Loading Ticket ID...
+        <!-- Header -->
+        <div class="ticket-header">
+            <div class="company-info">
+                <div class="company-logo">
+                    <i class="fas fa-ticket-alt"></i> TICKETPRO
+                </div>
+                <div class="company-details">
+                    <div class="company-name" id="companyName">YOUR COMPANY</div>
+                    <div class="company-tagline">Professional Support Solutions</div>
+                </div>
+            </div>
+            
+            <div class="ticket-title">
+                <h1>TICKET RECEIPT</h1>
+                <p>Official Document - Keep for Your Records</p>
+            </div>
         </div>
         
-        <div class="info">
-            <strong>Date:</strong> <span id="currentDate"></span>
+        <!-- Ticket ID Badge -->
+        <div class="ticket-id-badge">
+            <div class="ticket-id-label">Reference Number</div>
+            <div class="ticket-id-value" id="ticketIdDisplay">LOADING...</div>
         </div>
         
-        <div class="info">
-            <strong>Status:</strong> Print View
+        <!-- Ticket Details -->
+        <div class="ticket-body">
+            <div class="details-grid">
+                <div class="detail-card">
+                    <div class="detail-label">Date & Time</div>
+                    <div class="detail-value" id="dateTime">-</div>
+                </div>
+                
+                <div class="detail-card">
+                    <div class="detail-label">Document Type</div>
+                    <div class="detail-value">Support Ticket</div>
+                </div>
+                
+                <div class="detail-card">
+                    <div class="detail-label">Print Reference</div>
+                    <div class="detail-value">Zoho Desk Print System</div>
+                </div>
+                
+                <div class="detail-card">
+                    <div class="detail-label">Status</div>
+                    <div class="detail-value" id="ticketStatus">Official Receipt</div>
+                </div>
+            </div>
+            
+            <!-- Additional Information -->
+            <div class="detail-card">
+                <div class="detail-label">Important Information</div>
+                <div class="detail-value">
+                    This document serves as an official receipt of your support ticket. 
+                    Please retain this copy for your records. All ticket communications 
+                    and updates are available in your Zoho Desk portal.
+                </div>
+            </div>
+            
+            <!-- QR Code Placeholder -->
+            <div style="text-align: center; margin: 40px 0;">
+                <div class="detail-label">Quick Access QR</div>
+                <div class="qr-placeholder">
+                    <div>
+                        <i class="fas fa-qrcode fa-2x"></i><br>
+                        <small>Scan to access ticket</small>
+                    </div>
+                </div>
+                <p style="color: #6c757d; font-size: 12px; margin-top: 10px;">
+                    QR code would link to: https://desk.zoho.com/ticket/[ID]
+                </p>
+            </div>
         </div>
         
-        <div class="info">
-            <strong>Note:</strong> This is a printable receipt. For full details, please check Zoho Desk.
+        <!-- Footer -->
+        <div class="ticket-footer">
+            <div class="footer-grid">
+                <div class="print-info">
+                    <p><i class="fas fa-print"></i> <strong>Printed:</strong> <span id="printTimestamp"></span></p>
+                    <p><i class="fas fa-user"></i> <strong>Printed By:</strong> Zoho Desk User</p>
+                    <p><i class="fas fa-file-alt"></i> <strong>Document ID:</strong> <span id="documentId"></span></p>
+                </div>
+                
+                <div style="text-align: right;">
+                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 10px;">
+                        Page 1 of 1
+                    </div>
+                    <div style="font-size: 24px; font-weight: 700; color: #2c3e50;">
+                        <i class="fas fa-check-circle" style="color: #27ae60;"></i> VALID
+                    </div>
+                </div>
+            </div>
+            
+            <div class="security-note">
+                <i class="fas fa-shield-alt"></i>
+                <strong>Security Note:</strong> This document contains a unique reference ID. 
+                If found, please contact support@yourcompany.com.
+            </div>
         </div>
         
-        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #666;">
-            Printed on: <span id="printTime"></span><br>
-            Generated via Zoho Desk Print Button
-        </div>
-        
-        <div class="no-print" style="text-align: center; margin-top: 30px;">
-            <button class="print-btn" onclick="window.print()">🖨️ PRINT TICKET</button>
-            <button class="close-btn" onclick="window.close()">✕ CLOSE</button>
+        <!-- Action Buttons -->
+        <div class="action-buttons no-print">
+            <button class="btn btn-print" onclick="printTicket()">
+                <i class="fas fa-print"></i> PRINT TICKET
+            </button>
+            <button class="btn btn-download" onclick="downloadAsPDF()">
+                <i class="fas fa-download"></i> DOWNLOAD PDF
+            </button>
+            <button class="btn btn-close" onclick="closeWindow()">
+                <i class="fas fa-times"></i> CLOSE WINDOW
+            </button>
         </div>
     </div>
 
     <script>
-        // Get ticket ID from URL
-        function getTicketId() {
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTicket();
+            setupKeyboardShortcuts();
+            
+            // Optional: Auto-print after 2 seconds
+            // setTimeout(printTicket, 2000);
+        });
+        
+        function initializeTicket() {
+            // Get ticket ID from URL
             const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('id') || 'NO-ID-PROVIDED';
+            const ticketId = urlParams.get('id') || 'NO-ID-PROVIDED';
+            
+            // Generate unique document ID
+            const docId = 'DOC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            
+            // Get current date/time
+            const now = new Date();
+            const formattedDateTime = formatDateTime(now);
+            
+            // Update all elements
+            document.getElementById('ticketIdDisplay').textContent = ticketId;
+            document.getElementById('dateTime').textContent = formattedDateTime;
+            document.getElementById('printTimestamp').textContent = formattedDateTime;
+            document.getElementById('documentId').textContent = docId;
+            
+            // Update page title
+            document.title = `Ticket ${ticketId} - Official Receipt`;
+            
+            // Update browser history
+            const newUrl = window.location.pathname + '?id=' + ticketId;
+            window.history.replaceState({}, document.title, newUrl);
+            
+            // Store in localStorage for tracking
+            localStorage.setItem('lastPrintedTicket', ticketId);
+            localStorage.setItem('lastPrintTime', now.toISOString());
         }
         
-        // Update page with ticket info
-        function updatePage() {
-            const ticketId = getTicketId();
-            const now = new Date();
-            
-            // Format date
-            const formattedDate = now.toLocaleString('en-US', {
+        function formatDateTime(date) {
+            const options = {
+                weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
                 hour: '2-digit',
-                minute: '2-digit'
-            });
-            
-            // Update elements
-            document.getElementById('ticketNumber').textContent = `TICKET: ${ticketId}`;
-            document.getElementById('currentDate').textContent = formattedDate;
-            document.getElementById('printTime').textContent = formattedDate;
-            
-            // Update page title
-            document.title = `Ticket ${ticketId} - Print View`;
+                minute: '2-digit',
+                second: '2-digit',
+                timeZoneName: 'short'
+            };
+            return date.toLocaleDateString('en-US', options);
         }
         
-        // Auto-print after 1 second (optional)
-        function autoPrint() {
+        function printTicket() {
+            console.log('🖨️ Printing ticket...');
+            
+            // Before print actions
+            document.body.classList.add('printing');
+            
+            // Print
+            window.print();
+            
+            // After print actions
             setTimeout(() => {
-                window.print();
-            }, 1000);
+                document.body.classList.remove('printing');
+                showPrintCompleteToast();
+            }, 500);
         }
         
-        // Initialize
-        window.onload = function() {
-            updatePage();
-            // Uncomment next line for auto-print:
-            // autoPrint();
-        };
+        function downloadAsPDF() {
+            // This would require a PDF generation service
+            // For now, we'll just print
+            alert('PDF export requires backend setup. Printing instead...');
+            printTicket();
+        }
         
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') window.close();
-            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
-                e.preventDefault();
-                window.print();
+        function closeWindow() {
+            // Confirm before closing if not printed
+            if (!document.body.classList.contains('printing')) {
+                const hasPrinted = localStorage.getItem('ticketPrinted') === 'true';
+                if (!hasPrinted) {
+                    const confirmClose = confirm('You haven\'t printed this ticket. Close anyway?');
+                    if (!confirmClose) return;
+                }
             }
-        });
+            window.close();
+        }
+        
+        function showPrintCompleteToast() {
+            // Create toast notification
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #27ae60;
+                color: white;
+                padding: 15px 25px;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            toast.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                Ticket printed successfully!
+            `;
+            document.body.appendChild(toast);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+            
+            // Add CSS for animation
+            if (!document.querySelector('#toast-animations')) {
+                const style = document.createElement('style');
+                style.id = 'toast-animations';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes slideOut {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(100%); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Mark as printed
+            localStorage.setItem('ticketPrinted', 'true');
+        }
+        
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                // Ctrl/Cmd + P = Print
+                if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                    e.preventDefault();
+                    printTicket();
+                }
+                
+                // Ctrl/Cmd + S = Save/Download
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    downloadAsPDF();
+                }
+                
+                // Escape = Close
+                if (e.key === 'Escape') {
+                    closeWindow();
+                }
+                
+                // F5 = Refresh data
+                if (e.key === 'F5') {
+                    e.preventDefault();
+                    initializeTicket();
+                    alert('Ticket data refreshed!');
+                }
+            });
+        }
+        
+        // Generate QR code URL
+        function getTicketUrl() {
+            const ticketId = new URLSearchParams(window.location.search).get('id');
+            return `https://desk.zoho.com/ticket/${ticketId}`;
+        }
     </script>
 </body>
 </html>
