@@ -664,6 +664,29 @@
             const ticketId = new URLSearchParams(window.location.search).get('id');
             return `https://desk.zoho.com/ticket/${ticketId}`;
         }
+        FORCE a test ID if none provided
+    const urlParams = new URLSearchParams(window.location.search);
+    let ticketId = urlParams.get('id');
+    
+    if (!ticketId || ticketId === 'NO-ID-PROVIDED') {
+        // Generate test ID
+        ticketId = 'DEMO-' + Date.now().toString().slice(-6);
+        
+        // Update URL without reload
+        const newUrl = window.location.pathname + '?id=' + ticketId;
+        window.history.replaceState({}, document.title, newUrl);
+        
+        // Update display
+        document.getElementById('ticketIdDisplay').textContent = ticketId;
+        document.title = 'TEST MODE - ' + document.title;
+        
+        // Show test banner
+        const banner = document.createElement('div');
+        banner.style.cssText = 'background:#ffc107;color:#333;padding:10px;text-align:center;font-weight:bold;';
+        banner.innerHTML = '⚠️ TEST MODE - Add ?id=TICKET_ID to URL';
+        document.body.insertBefore(banner, document.body.firstChild);
+    }
     </script>
+    
 </body>
 </html>
