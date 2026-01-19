@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Print Ticket</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #f0f2f5;
+        }
+        .ticket {
+            background: white;
+            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+        }
+        .ticket-id {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 24px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .info {
+            margin: 15px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .print-btn {
+            background: #27ae60;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        .close-btn {
+            background: #e74c3c;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        @media print {
+            body { padding: 0; background: white; }
+            .ticket { box-shadow: none; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="ticket">
+        <h1>🎫 TICKET RECEIPT</h1>
+        
+        <div class="ticket-id" id="ticketNumber">
+            Loading Ticket ID...
+        </div>
+        
+        <div class="info">
+            <strong>Date:</strong> <span id="currentDate"></span>
+        </div>
+        
+        <div class="info">
+            <strong>Status:</strong> Print View
+        </div>
+        
+        <div class="info">
+            <strong>Note:</strong> This is a printable receipt. For full details, please check Zoho Desk.
+        </div>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #666;">
+            Printed on: <span id="printTime"></span><br>
+            Generated via Zoho Desk Print Button
+        </div>
+        
+        <div class="no-print" style="text-align: center; margin-top: 30px;">
+            <button class="print-btn" onclick="window.print()">🖨️ PRINT TICKET</button>
+            <button class="close-btn" onclick="window.close()">✕ CLOSE</button>
+        </div>
+    </div>
+
+    <script>
+        // Get ticket ID from URL
+        function getTicketId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id') || 'NO-ID-PROVIDED';
+        }
+        
+        // Update page with ticket info
+        function updatePage() {
+            const ticketId = getTicketId();
+            const now = new Date();
+            
+            // Format date
+            const formattedDate = now.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // Update elements
+            document.getElementById('ticketNumber').textContent = `TICKET: ${ticketId}`;
+            document.getElementById('currentDate').textContent = formattedDate;
+            document.getElementById('printTime').textContent = formattedDate;
+            
+            // Update page title
+            document.title = `Ticket ${ticketId} - Print View`;
+        }
+        
+        // Auto-print after 1 second (optional)
+        function autoPrint() {
+            setTimeout(() => {
+                window.print();
+            }, 1000);
+        }
+        
+        // Initialize
+        window.onload = function() {
+            updatePage();
+            // Uncomment next line for auto-print:
+            // autoPrint();
+        };
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') window.close();
+            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                e.preventDefault();
+                window.print();
+            }
+        });
+    </script>
+</body>
+</html>
